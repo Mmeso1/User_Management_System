@@ -32,17 +32,28 @@ const initialState: UserState = {
   error: null,
 };
 
-export const fetchUsersDetails = createAsyncThunk<User[]>(
-  "users/fetchUsers",
-  async () => {
-    try {
-      const response = await axios.get(POSTS_URL);
-      return [...response.data]; // done to keep the original data immutable
-    } catch (error) {
-      throw error;
-    }
+// got this idea from the net cause i was tring to find a way to persist the data without touching the api
+// i was able to get the data from the api and store it in the redux store
+// so i can use it in the app without having to make a request to the api
+export const fetchUsersDetails = createAsyncThunk<
+  User[],
+  void,
+  { state: { users: UserState } }
+>("users/fetchUsers", async (_, { getState }) => {
+  const { usersDetails } = getState().users;
+
+  // Only fetch from API if usersDetails is empty
+  if (usersDetails.length > 0) {
+    return usersDetails;
   }
-);
+
+  try {
+    const response = await axios.get(POSTS_URL);
+    return response.data; // Load initial data
+  } catch (error) {
+    throw error;
+  }
+});
 
 const userSlice = createSlice({
   name: "users",
