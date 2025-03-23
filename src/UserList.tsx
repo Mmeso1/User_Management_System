@@ -1,82 +1,48 @@
-import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch } from "./redux/store";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersDetails } from "./redux/slices/userSlice";
-import UserCard from "./UserCard";
+import { RootState, AppDispatch } from "./redux/store";
+import { Link } from "react-router-dom"; // Import Link from React Router
 
-const UserList = () => {
+const UserList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [userDetails, setUserDetails] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
+  const users = useSelector((state: RootState) => state.users.usersDetails);
+  const status = useSelector((state: RootState) => state.users.status);
+  const error = useSelector((state: RootState) => state.users.error);
 
   useEffect(() => {
-    dispatch(fetchUsersDetails()).then((response: any) => {
-      setUserDetails(response.payload);
-    });
+    dispatch(fetchUsersDetails());
   }, [dispatch]);
 
-  const filteredUsers = userDetails.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase())
-  );
+  if (status === "loading") {
+    return <div className="text-center py-8">Loading users...</div>;
+  }
+
+  if (status === "failed") {
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  }
 
   return (
-    <>
-      <div className="container mx-auto p-4 w-full">
-        {/* Shared container for search and table */}
-        <div className="bg-white p-4 rounded-md shadow-md">
-          {/* Search bar */}
-          <div className="flex justify-between items-center mb-4">
-            <input
-              type="text"
-              placeholder="Search users..."
-              className="w-1/3 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline">
-              Add User
-            </button>
-          </div>
-
-          {/* Table */}
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr className="bg-gray-50 text-left">
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  #
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Username
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Website
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Address
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Company
-                </th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map((user, index) => (
-                <UserCard key={index} user={user} index={index} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Users List</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {users.map((user) => (
+          <Link
+            key={user.id}
+            to={`/users/${user.id}`}
+            className="block rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white"
+          >
+            <div className="p-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {user.name}
+              </h2>
+              <p className="text-gray-600">Username: {user.username}</p>
+              <p className="text-gray-600">Email: {user.email}</p>
+            </div>
+          </Link>
+        ))}
       </div>
-    </>
+    </div>
   );
 };
 
