@@ -1,6 +1,5 @@
 import axios from "axios";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { act } from "react";
 
 const POSTS_URL = "https://jsonplaceholder.typicode.com/users";
 
@@ -33,7 +32,7 @@ const initialState: UserState = {
   error: null,
 };
 
-const fetchUsersDetails = createAsyncThunk<User[]>(
+export const fetchUsersDetails = createAsyncThunk<User[]>(
   "users/fetchUsers",
   async () => {
     try {
@@ -76,7 +75,10 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsersDetails.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.error.message || "An unknown error occured";
       });
   },
 });
+
+export const { addUser, updateUser, deleteUser } = userSlice.actions;
+export default userSlice.reducer;
