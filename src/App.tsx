@@ -12,6 +12,7 @@ function App() {
         <Route path=":id" element={<UserCard />} />
       </Route>
       <Route path="add-user" element={<UserForm />} />
+      <Route path="edit-user/:id" element={<UserForm />} />
     </Routes>
   );
 }
