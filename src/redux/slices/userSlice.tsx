@@ -1,5 +1,6 @@
 import axios from "axios";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { act } from "react";
 
 const POSTS_URL = "https://jsonplaceholder.typicode.com/users";
 
@@ -32,14 +33,50 @@ const initialState: UserState = {
   error: null,
 };
 
-const fetchUsersDetails = createAsyncThunk("users/fetchUsers", async () => {
-  try {
-    const response = await axios.get(POSTS_URL);
-    return [...response.data]; // done to keep the original data immutable
-  } catch (error) {
-    return error;
+const fetchUsersDetails = createAsyncThunk<User[]>(
+  "users/fetchUsers",
+  async () => {
+    try {
+      const response = await axios.get(POSTS_URL);
+      return [...response.data]; // done to keep the original data immutable
+    } catch (error) {
+      throw error;
+    }
   }
-});
+);
 
-// Example usage of axios to remove unused import error
-// axios.get('/api/example').then(response => console.log(response.data));
+const userSlice = createSlice({
+  name: "users",
+  initialState,
+  reducers: {
+    addUser: (state, action: PayloadAction<User>) => {
+      state.usersDetails.push(action.payload);
+    },
+    updateUser: (state, action: PayloadAction<User>) => {
+      const { id } = action.payload;
+      const existingUser = state.usersDetails.find((user) => user.id === id);
+      if (existingUser) {
+        state.usersDetails[id - 1] = action.payload;
+      }
+    },
+    deleteUser: (state, action: PayloadAction<number>) => {
+      state.usersDetails = state.usersDetails.filter(
+        (user) => user.id !== action.payload
+      );
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsersDetails.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchUsersDetails.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.usersDetails = action.payload;
+      })
+      .addCase(fetchUsersDetails.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      });
+  },
+});
