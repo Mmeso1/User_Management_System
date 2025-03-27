@@ -9,6 +9,7 @@ interface User {
   username: string;
   phone: string;
   email: string;
+  avatar: string;
   website: string;
   address: {
     suite: string;
@@ -82,7 +83,13 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsersDetails.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.usersDetails = action.payload;
+        state.usersDetails = action.payload.map((user: User) => {
+          const [firstname, lastname] = user.name.split(" ");
+          return {
+            ...user,
+            avatar: `https://avatar.iran.liara.run/username?username=${firstname}+${lastname}`,
+          };
+        });
       })
       .addCase(fetchUsersDetails.rejected, (state, action) => {
         state.status = "failed";

@@ -22,6 +22,7 @@ const UserForm = () => {
     email: "",
     phone: "",
     website: "",
+    avatar: "",
     suite: "",
     city: "",
     companyName: "",
@@ -36,6 +37,7 @@ const UserForm = () => {
         email: existingUser.email,
         phone: existingUser.phone,
         website: existingUser.website,
+        avatar: existingUser.avatar,
         suite: existingUser.address.suite,
         city: existingUser.address.city,
         companyName: existingUser.company.name,
@@ -60,6 +62,7 @@ const UserForm = () => {
       email: formData.email,
       phone: formData.phone,
       website: formData.website,
+      avatar: formData.avatar,
       address: {
         suite: formData.suite,
         city: formData.city,
@@ -214,7 +217,7 @@ const UserForm = () => {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline cursor-pointer"
           >
             {userId ? "Update User" : "Add User"}
           </button>

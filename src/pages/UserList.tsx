@@ -4,6 +4,7 @@ import { fetchUsersDetails } from "../redux/slices/userSlice";
 import { RootState, AppDispatch } from "../redux/store";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
+import UserCard from "./UserCard";
 
 const UserList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,19 +37,13 @@ const UserList: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {users.map((user) => (
-          <Link
-            key={user.id}
-            to={`/users/${user.id}`}
-            className="block rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white"
-          >
-            <div className="p-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {user.name}
-              </h2>
-              <p className="text-gray-600">Username: {user.username}</p>
-              <p className="text-gray-600">Email: {user.email}</p>
-            </div>
-          </Link>
+          <UserCard
+            id={user.id}
+            avatar={user.avatar}
+            name={user.name}
+            username={user.username}
+            email={user.email}
+          />
         ))}
       </div>
     </div>
